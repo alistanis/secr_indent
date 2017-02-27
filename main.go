@@ -28,6 +28,8 @@ func main() {
 	paths := strings.Split(files, ",")
 
 	for _, p := range paths {
+		fmt.Println(p)
+		fmt.Println()
 		data, err := ioutil.ReadFile(p)
 		if err != nil {
 			exitErr(err)
