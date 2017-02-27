@@ -11,10 +11,12 @@ import (
 
 var (
 	files string
+	o     string
 )
 
 func init() {
 	flag.StringVar(&files, "f", "", "Comma separated list of files to indent (will print them to stdout)")
+	flag.StringVar(&o, "o", "", "Out file to write to.")
 	flag.Parse()
 }
 
@@ -26,21 +28,31 @@ func main() {
 	}
 
 	paths := strings.Split(files, ",")
+	buf := bytes.NewBuffer([]byte{})
 
 	for _, p := range paths {
-		fmt.Println(p)
-		fmt.Println()
+
+		buf.WriteString("*" + p + "*" + "\n\n")
+		buf.WriteString("    ")
 		data, err := ioutil.ReadFile(p)
 		if err != nil {
 			exitErr(err)
 		}
-		buf := bytes.NewBuffer([]byte("    "))
+
 		for _, b := range data {
 			buf.WriteByte(b)
 			if b == '\n' {
 				buf.WriteString("    ")
 			}
 		}
+		buf.WriteRune('\n')
+	}
+	if o != "" {
+		err := ioutil.WriteFile(o, buf.Bytes(), 0664)
+		if err != nil {
+			exitErr(err)
+		}
+	} else {
 		fmt.Println(buf.String())
 	}
 
